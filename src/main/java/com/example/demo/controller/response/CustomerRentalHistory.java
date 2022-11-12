@@ -1,29 +1,26 @@
-package com.example.demo.entity;
+package com.example.demo.controller.response;
 
 import com.example.demo.constant.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "order_history")
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class OrderHistory {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+@NoArgsConstructor
+@JsonIgnoreProperties
+public class CustomerRentalHistory {
     private String orderId;
-    private String customerId;
     private String carId;
     private LocalDateTime bookStartTime;
     private LocalDateTime bookEndTime;
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
     private OrderStatus status;
+    private boolean canCancel;
 }
