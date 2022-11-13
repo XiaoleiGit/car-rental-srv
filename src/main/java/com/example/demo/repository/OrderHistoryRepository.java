@@ -1,6 +1,5 @@
 package com.example.demo.repository;
 
-import com.example.demo.entity.CarInfo;
 import com.example.demo.entity.OrderHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,7 +24,7 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long
             "   and (book_start_time between ?2 and ?3\n" +
             "       or book_end_time between ?2 and ?3)\n" +
             " )", nativeQuery = true)
-    List<Map<String, Object>> findCars(String city, LocalDateTime start, LocalDateTime end);
+    List<Map<String, Object>> findAvailableCars(String city, LocalDateTime start, LocalDateTime end);
 
     List<OrderHistory> findByCustomerIdOrderByBookStartTimeDesc(String customerId);
 

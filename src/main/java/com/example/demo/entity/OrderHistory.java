@@ -28,7 +28,7 @@ public class OrderHistory {
     private LocalDateTime bookEndTime;
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
-    private OrderStatus status;
+    private String status;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

@@ -7,7 +7,6 @@ import com.example.demo.entity.CarInfo;
 import com.example.demo.entity.OrderHistory;
 import com.example.demo.repository.OrderHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,9 @@ public class OrderHistoryService {
     @Autowired
     private OrderHistoryRepository orderHistoryRepository;
 
-    public List<CarListPerStore> getCars(String city, LocalDateTime start, LocalDateTime end) {
+    public List<CarListPerStore> getCarsByCityAndTime(String city, LocalDateTime start, LocalDateTime end) {
         log.info("Start retrieving available cars from DB, city {}, startTime {}, endTime {}", city, start, end);
-        List<Map<String, Object>> carList = orderHistoryRepository.findCars(city, start, end);
+        List<Map<String, Object>> carList = orderHistoryRepository.findAvailableCars(city, start, end);
         log.info("Retrieved available cars from DB, size: {}", carList.size());
         List<CarListPerStore> response = new ArrayList<>();
         HashMap<String, CarListPerStore> map = new HashMap<>();
@@ -63,8 +62,8 @@ public class OrderHistoryService {
                     .bookEndTime(orderHistory.getBookEndTime())
                     .actualStartTime(orderHistory.getActualStartTime())
                     .actualEndTime(orderHistory.getActualEndTime())
-                    .status(orderHistory.getStatus())
-                    .canCancel(orderHistory.getStatus().equals(OrderStatus.ON) && LocalDateTime.now().compareTo(orderHistory.getBookStartTime()) < 0)
+                    .status(OrderStatus.valueOf(orderHistory.getStatus()))
+                    .canCancel(orderHistory.getStatus().equals(OrderStatus.ON.toString()) && LocalDateTime.now().compareTo(orderHistory.getBookStartTime()) < 0)
                     .build();
             response.add(item);
         }
@@ -73,24 +72,29 @@ public class OrderHistoryService {
     }
 
     public boolean createOrder(String customerId, String carId, LocalDateTime startTime, LocalDateTime endTime) {
+        log.info("Start creating new rental order for customer {}", customerId);
         OrderHistory newOrder = new OrderHistory();
         newOrder.setOrderId(UUID.randomUUID().toString().replace("-",""));
         newOrder.setCustomerId(customerId);
         newOrder.setCarId(carId);
         newOrder.setBookStartTime(startTime);
         newOrder.setBookEndTime(endTime);
-        newOrder.setStatus(OrderStatus.ON);
+        newOrder.setStatus(OrderStatus.ON.toString());
         newOrder.setCreatedAt(LocalDateTime.now());
         newOrder.setCreatedBy("system");
         newOrder.setUpdatedAt(LocalDateTime.now());
         newOrder.setUpdatedBy("system");
         orderHistoryRepository.save(newOrder);
+        log.info("New rental order created. CustomerId: {}, CarId: {}", customerId, carId);
         return true;
     }
 
     public boolean cancelOrder(String orderId) {
         OrderHistory order = orderHistoryRepository.findByOrderId(orderId);
-        order.setStatus(OrderStatus.OFF);
+        order.setStatus(OrderStatus.OFF.toString());
+        order.setUpdatedAt(LocalDateTime.now());
+        orderHistoryRepository.save(order);
+        log.info("Order is cancelled. OrderId: {}", orderId);
         return true;
     }
 

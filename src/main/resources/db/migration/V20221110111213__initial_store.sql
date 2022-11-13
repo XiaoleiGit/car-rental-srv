@@ -20,5 +20,5 @@ CREATE TABLE "store" (
     "updated_at" timestamp
 );
 
-INSERT INTO "store" VALUES (1, 'store001', 'Nanshan can rental company', '123456789', 'Shenzhen', 'Nanshan',
+INSERT INTO "store" VALUES (1, 'store001', 'Nanshan car rental company', '123456789', 'Shenzhen', 'Nanshan',
 'system', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP);

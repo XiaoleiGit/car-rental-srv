@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.controller.request.OrderCreateRequest;
 import com.example.demo.controller.response.CarListPerStore;
 import com.example.demo.controller.response.CustomerRentalHistory;
 import com.example.demo.entity.OrderHistory;
@@ -36,23 +37,22 @@ public class CarRentalController {
     // http://localhost:80/car-rental/cities/Shenzhen/stores/-/cars?startTime=2022-11-01T00:00:00&endTime=2022-11-11T00:00:00
     @GetMapping(path = "/car-rental/cities/{city}/stores/-/cars")
     public List<CarListPerStore> getAvailableCars(@PathVariable String city, @RequestParam String startTime, @RequestParam String endTime) {
-        return orderHistoryService.getCars(city, LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));
+        return orderHistoryService.getCarsByCityAndTime(city, LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));
     }
 
     // http://localhost:80/customers/1000000001/order/history
-    @GetMapping(path = "/customers/{customerId}/rental-history")
+    @GetMapping(path = "/customers/{customerId}/order/history")
     public List<CustomerRentalHistory> getCustomerRentalHistory(@PathVariable String customerId) {
         return orderHistoryService.getCustomerRentalHistory(customerId);
     }
 
     // http://localhost:80/customers/1000000001/order/create
     @PostMapping(path = "/customers/{customerId}/order/create")
-    public boolean rentalOrderCreate(@PathVariable String customerId, @RequestParam String carId,
-        @RequestParam String startTime, @RequestParam String endTime) {
-        return orderHistoryService.createOrder(customerId, carId, LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));
+    public boolean rentalOrderCreate(@PathVariable String customerId, @RequestBody OrderCreateRequest request) {
+        return orderHistoryService.createOrder(customerId, request.getCarId(), LocalDateTime.parse(request.getStartTime()), LocalDateTime.parse(request.getEndTime()));
     }
 
-    // http://localhost:80/customers/1000000001/order/cancel?orderId=3556cc4149154b85938edc0f35523170
+    // http://localhost:80/customers/1000000001/order/cancel
     @PostMapping(path = "/customers/{customerId}/order/cancel")
     public boolean rentalOrderCancel(@RequestParam String orderId) {
         return orderHistoryService.cancelOrder(orderId);
