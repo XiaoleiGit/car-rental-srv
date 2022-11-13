@@ -27,7 +27,9 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long
             " )", nativeQuery = true)
     List<Map<String, Object>> findCars(String city, LocalDateTime start, LocalDateTime end);
 
-    List<OrderHistory> findByCustomerId(String customerId);
+    List<OrderHistory> findByCustomerIdOrderByBookStartTimeDesc(String customerId);
+
+    OrderHistory findByOrderId(String orderId);
 }
 
 

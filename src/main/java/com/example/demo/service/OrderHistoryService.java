@@ -7,6 +7,7 @@ import com.example.demo.entity.CarInfo;
 import com.example.demo.entity.OrderHistory;
 import com.example.demo.repository.OrderHistoryRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,7 @@ public class OrderHistoryService {
     public CarInfo buildCarInfo(Map<String, Object> car) {
         return CarInfo.builder()
                 .carId(car.get("carId").toString())
+                .storeId(car.get("storeId").toString())
                 .type(car.get("type").toString())
                 .pricePerDay(new BigDecimal(car.get("pricePerDay").toString()))
                 .currency(car.get("currency").toString())
@@ -51,7 +53,7 @@ public class OrderHistoryService {
 
     public List<CustomerRentalHistory> getCustomerRentalHistory(String customerId) {
         log.info("Start retrieving rental history, customerId: {}", customerId);
-        List<OrderHistory> orderHistoryListList = orderHistoryRepository.findByCustomerId(customerId);
+        List<OrderHistory> orderHistoryListList = orderHistoryRepository.findByCustomerIdOrderByBookStartTimeDesc(customerId);
         List<CustomerRentalHistory> response = new ArrayList<>();
         for (OrderHistory orderHistory : orderHistoryListList) {
             CustomerRentalHistory item = CustomerRentalHistory.builder()
@@ -68,5 +70,31 @@ public class OrderHistoryService {
         }
         log.info("CustomerRentalHistory is built, customerId {}, size {}", customerId, response.size());
         return response;
+    }
+
+    public boolean createOrder(String customerId, String carId, LocalDateTime startTime, LocalDateTime endTime) {
+        OrderHistory newOrder = new OrderHistory();
+        newOrder.setOrderId(UUID.randomUUID().toString().replace("-",""));
+        newOrder.setCustomerId(customerId);
+        newOrder.setCarId(carId);
+        newOrder.setBookStartTime(startTime);
+        newOrder.setBookEndTime(endTime);
+        newOrder.setStatus(OrderStatus.ON);
+        newOrder.setCreatedAt(LocalDateTime.now());
+        newOrder.setCreatedBy("system");
+        newOrder.setUpdatedAt(LocalDateTime.now());
+        newOrder.setUpdatedBy("system");
+        orderHistoryRepository.save(newOrder);
+        return true;
+    }
+
+    public boolean cancelOrder(String orderId) {
+        OrderHistory order = orderHistoryRepository.findByOrderId(orderId);
+        order.setStatus(OrderStatus.OFF);
+        return true;
+    }
+
+    public OrderHistory getOrder(String orderId) {
+        return orderHistoryRepository.findByOrderId(orderId);
     }
 }

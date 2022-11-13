@@ -2,15 +2,18 @@ package com.example.demo.entity;
 
 import com.example.demo.constant.OrderStatus;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "order_history")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderHistory {
@@ -26,4 +29,8 @@ public class OrderHistory {
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
     private OrderStatus status;
+    private String createdBy;
+    private LocalDateTime createdAt;
+    private String updatedBy;
+    private LocalDateTime updatedAt;
 }

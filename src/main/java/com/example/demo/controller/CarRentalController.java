@@ -2,15 +2,13 @@ package com.example.demo.controller;
 
 import com.example.demo.controller.response.CarListPerStore;
 import com.example.demo.controller.response.CustomerRentalHistory;
+import com.example.demo.entity.OrderHistory;
 import com.example.demo.service.CustomerService;
 import com.example.demo.service.OrderHistoryService;
 import com.example.demo.service.CarInfoService;
 import com.example.demo.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,11 +28,6 @@ public class CarRentalController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping(path = "/test")
-    public int test() {
-        return carInfoService.getCarsByType("BMW 650");
-    }
-
     @GetMapping(path = "/cities")
     public List<String> getCities() {
         return storeService.getCities();
@@ -50,5 +43,21 @@ public class CarRentalController {
     @GetMapping(path = "/customers/{customerId}/rental-history")
     public List<CustomerRentalHistory> getCustomerRentalHistory(@PathVariable String customerId) {
         return orderHistoryService.getCustomerRentalHistory(customerId);
+    }
+
+    @PostMapping(path = "/order/create")
+    public boolean rentalOrderCreate(@RequestParam String customerId, @RequestParam String carId,
+        @RequestParam String startTime, @RequestParam String endTime) {
+        return orderHistoryService.createOrder(customerId, carId, LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));
+    }
+
+    @PostMapping(path = "/order/cancel")
+    public boolean rentalOrderCancel(@RequestParam String orderId) {
+        return orderHistoryService.cancelOrder(orderId);
+    }
+
+    @GetMapping(path = "/order/detail")
+    public OrderHistory rentalOrderDetail(@RequestParam String orderId) {
+        return orderHistoryService.getOrder(orderId);
     }
 }

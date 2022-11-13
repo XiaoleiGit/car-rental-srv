@@ -8,8 +8,8 @@ CREATE SEQUENCE "order_history_seq"
 
 DROP TABLE if EXISTS "order_history";
 CREATE TABLE "order_history" (
-    "id" int NOT NULL PRIMARY KEY,
-    "order_id" varchar(30) NOT NULL,
+    "id" SERIAL PRIMARY KEY,
+    "order_id" varchar(32) NOT NULL,
     "customer_id" varchar(10) NOT NULL,
     "car_id" varchar(10) NOT NULL,
     "book_start_time" timestamp NOT NULL,
