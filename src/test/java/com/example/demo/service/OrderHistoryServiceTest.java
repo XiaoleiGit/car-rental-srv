@@ -42,7 +42,7 @@ public class OrderHistoryServiceTest {
         List<CustomerRentalHistory> response = orderHistoryService.getCustomerRentalHistory("customerId");
 
         assertEquals(1, response.size()); // number of store
-        assertEquals(false, response.get(0).isCanCancel());
+        assertEquals(true, response.get(0).isCanCancel());
     }
 
 }

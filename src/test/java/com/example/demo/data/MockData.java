@@ -19,6 +19,8 @@ public class MockData {
         map1.put("carId", "car001");
         map1.put("storeId", "store001");
         map1.put("storeName", "Car rental company");
+        map1.put("storeAddress", "Nanshan");
+        map1.put("storePhone", "135135135");
         map1.put("pricePerDay", BigDecimal.valueOf(123));
         map1.put("currency", "CNY");
         map1.put("type", "Toyota Camry");
@@ -28,6 +30,8 @@ public class MockData {
         map2.put("carId", "car002");
         map2.put("storeId", "store002");
         map2.put("storeName", "Car rental company");
+        map2.put("storeAddress", "Nanshan");
+        map2.put("storePhone", "135135135");
         map2.put("pricePerDay", BigDecimal.valueOf(220));
         map2.put("currency", "CNY");
         map2.put("type", "Toyota Camry");
@@ -38,7 +42,7 @@ public class MockData {
     public static List<OrderHistory> orderHistoryList() {
         OrderHistory order = OrderHistory.builder().orderId("124567890").carId("car001")
                 .customerId("customer001").status("ON").bookStartTime(LocalDateTime.of(2022,11,11,12,0,0,0))
-                .bookEndTime(LocalDateTime.now()).build();
+                .bookEndTime(LocalDateTime.now().plusDays(2)).build();
         List<OrderHistory> list = new ArrayList<>();
         list.add(order);
         return list;
