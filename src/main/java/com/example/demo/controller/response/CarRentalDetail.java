@@ -6,17 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties
-public class CarListPerStore {
-    private String storeId;
-    private String storeName;
-    private String storeAddress;
-    private String storePhone;
-    private List<CarRentalDetail> cars;
+public class CarRentalDetail {
+    private String type;
+    private String carId;
+    private BigDecimal pricePerDay;
+    private String currency;
 }

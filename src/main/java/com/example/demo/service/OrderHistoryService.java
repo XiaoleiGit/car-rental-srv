@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.Exception.OrderException;
 import com.example.demo.constant.OrderStatus;
 import com.example.demo.controller.response.CarListPerStore;
+import com.example.demo.controller.response.CarRentalDetail;
 import com.example.demo.controller.response.CustomerRentalHistory;
 import com.example.demo.entity.CarInfo;
 import com.example.demo.entity.OrderHistory;
@@ -24,15 +26,16 @@ public class OrderHistoryService {
         log.info("Start retrieving available cars from DB, city {}, startTime {}, endTime {}", city, start, end);
         List<Map<String, Object>> carList = orderHistoryRepository.findAvailableCars(city, start, end);
         log.info("Retrieved available cars from DB, size: {}", carList.size());
-        List<CarListPerStore> response = new ArrayList<>();
         HashMap<String, CarListPerStore> map = new HashMap<>();
         for (Map<String, Object> car : carList) {
             String storeId = car.get("storeId").toString();
             CarListPerStore item = map.getOrDefault(storeId, new CarListPerStore());
             item.setStoreId(car.get("storeId").toString());
             item.setStoreName(car.get("storeName").toString());
-            List<CarInfo> list = item.getCars() == null ? new ArrayList<>() : item.getCars();
-            list.add(buildCarInfo(car));
+            item.setStoreAddress(car.get("storeAddress").toString());
+            item.setStorePhone(car.get("storePhone").toString());
+            List<CarRentalDetail> list = item.getCars() == null ? new ArrayList<>() : item.getCars();
+            list.add(buildCarRentalDetail(car));
             item.setCars(list);
             map.put(storeId, item);
         }
@@ -40,10 +43,9 @@ public class OrderHistoryService {
         return new ArrayList<>(map.values());
     }
 
-    public CarInfo buildCarInfo(Map<String, Object> car) {
-        return CarInfo.builder()
+    public CarRentalDetail buildCarRentalDetail(Map<String, Object> car) {
+        return CarRentalDetail.builder()
                 .carId(car.get("carId").toString())
-                .storeId(car.get("storeId").toString())
                 .type(car.get("type").toString())
                 .pricePerDay(new BigDecimal(car.get("pricePerDay").toString()))
                 .currency(car.get("currency").toString())
@@ -63,7 +65,8 @@ public class OrderHistoryService {
                     .actualStartTime(orderHistory.getActualStartTime())
                     .actualEndTime(orderHistory.getActualEndTime())
                     .status(OrderStatus.valueOf(orderHistory.getStatus()))
-                    .canCancel(orderHistory.getStatus().equals(OrderStatus.ON.toString()) && LocalDateTime.now().compareTo(orderHistory.getBookStartTime()) < 0)
+                    .canCancel(orderHistory.getStatus().equals(OrderStatus.ON.toString())
+                            && orderHistory.getActualStartTime() == null)
                     .build();
             response.add(item);
         }
@@ -71,10 +74,14 @@ public class OrderHistoryService {
         return response;
     }
 
-    public boolean createOrder(String customerId, String carId, LocalDateTime startTime, LocalDateTime endTime) {
+    public String createOrder(String customerId, String carId, LocalDateTime startTime, LocalDateTime endTime) {
+        if (LocalDateTime.now().toLocalDate().plusDays(1).isAfter(endTime.toLocalDate())) {
+            throw new OrderException("The book end date must be at least one day after today");
+        }
         log.info("Start creating new rental order for customer {}", customerId);
         OrderHistory newOrder = new OrderHistory();
-        newOrder.setOrderId(UUID.randomUUID().toString().replace("-",""));
+        String orderId = UUID.randomUUID().toString().replace("-","");
+        newOrder.setOrderId(orderId);
         newOrder.setCustomerId(customerId);
         newOrder.setCarId(carId);
         newOrder.setBookStartTime(startTime);
@@ -86,7 +93,7 @@ public class OrderHistoryService {
         newOrder.setUpdatedBy("system");
         orderHistoryRepository.save(newOrder);
         log.info("New rental order created. CustomerId: {}, CarId: {}", customerId, carId);
-        return true;
+        return orderId;
     }
 
     public boolean cancelOrder(String orderId) {

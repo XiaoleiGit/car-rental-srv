@@ -13,7 +13,8 @@ import java.util.Map;
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
 
     @Query(value =
-            "select ci.car_id as carId, ci.store_id as storeId, s.name as storeName, ci.price_per_day as pricePerDay," +
+            "select ci.car_id as carId, ci.store_id as storeId, s.name as storeName, s.address as storeAddress, " +
+            " s.phone as storePhone, ci.price_per_day as pricePerDay," +
             " ci.currency as currency, ci.type as type \n" +
             " from car_info ci\n" +
             " left join store s on ci.store_id = s.store_id\n" +

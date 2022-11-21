@@ -48,7 +48,7 @@ public class CarRentalController {
 
     // http://localhost:80/customers/1000000001/order/create
     @PostMapping(path = "/customers/{customerId}/order/create")
-    public boolean rentalOrderCreate(@PathVariable String customerId, @RequestBody OrderCreateRequest request) {
+    public String rentalOrderCreate(@PathVariable String customerId, @RequestBody OrderCreateRequest request) {
         return orderHistoryService.createOrder(customerId, request.getCarId(), LocalDateTime.parse(request.getStartTime()), LocalDateTime.parse(request.getEndTime()));
     }
 
